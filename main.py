@@ -31,11 +31,15 @@ def get_count():
   delta = today - datetime.strptime(start_date, "%Y-%m-%d")
   return delta.days
   
+def add_spaces(text, interval=20):
+    return ' '.join(text[i:i+interval] for i in range(0, len(text), interval))
+
 def get_words():
-  words = requests.get("https://api.xygeng.cn/one")
-  if words.status_code != 200:
-    return get_words()
-  return words.json()['data']['text']
+    words = requests.get("https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10")
+    words.encoding = 'utf-8'
+    if words.status_code != 200:
+        return get_words()
+    return add_spaces(words.json()['data']['text'])
 
   
 def get_random_color():
