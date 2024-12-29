@@ -19,7 +19,6 @@ app_secret = os.environ["APP_SECRET"]
 user_id = os.environ["USER_ID"]
 template_id = os.environ["TEMPLATE_ID"]
 
-emoji_number = int(os.environ["EMOJI_MORNING_NUMBER"].strip())
 
 def get_weather():
   url = f"https://api.seniverse.com/v3/weather/daily.json?key=S-3Yf85YRFz1MzNUS&location=beijing&language=zh-Hans&unit=c"
@@ -42,9 +41,6 @@ def get_words():
 def get_random_color():
   return "#%06x" % random.randint(0, 0xFFFFFF)
 
-def get_random_emoji():
-    """获取随机emoji"""
-    return random.choice('💘💝💖💗💓💞💕🥰😍🤩😘😚😙💋💌👫💏💑🌹🤵👰✨🎈🎉')
   
 client = WeChatClient(app_id, app_secret)
 
@@ -68,9 +64,7 @@ data = {
         "color": get_random_color()
     }
 }
-# 添加emoji
-for i in range(emoji_number):
-    data['emoji{}'.format(i)] = {"value": get_random_emoji(), "color": black_color}
+
   
 res = wm.send_template(user_id, template_id, data)
 print(res)
