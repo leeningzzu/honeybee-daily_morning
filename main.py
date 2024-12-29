@@ -20,7 +20,7 @@ user_id = os.environ["USER_ID"]
 template_id = os.environ["TEMPLATE_ID"]
 
 def get_weather():
-  url = f"https://api.seniverse.com/v3/weather/daily.json?key={weather_key}&location=beijing&language=zh-Hans&unit=c"
+  url = f"https://api.seniverse.com/v3/weather/daily.json?key=S-3Yf85YRFz1MzNUS&location=beijing&language=zh-Hans&unit=c"
   res = requests.get(url).json()
   print(res)
   weather = (res['results'][0])["daily"][0]
