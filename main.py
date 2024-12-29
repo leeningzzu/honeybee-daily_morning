@@ -32,11 +32,11 @@ def get_count():
   return delta.days
   
 def get_words():
-    words = requests.get("https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10")
+    words = requests.get("http://open.iciba.com/dsapi/") #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
     words.encoding = 'utf-8'
     if words.status_code != 200:
         return get_words()
-    return words.json()['result']
+    return words.json()['data']['content']
 
   
 def get_random_color():
