@@ -36,7 +36,7 @@ def get_words():
     words.encoding = 'utf-8'
     if words.status_code != 200:
         return get_words()
-    return words.json()
+    return words.json()['result']
 
   
 def get_random_color():
