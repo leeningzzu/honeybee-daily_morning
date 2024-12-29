@@ -35,6 +35,7 @@ def add_spaces(text, interval=20):
   
 def get_words():
   words = requests.get("https://api.52vmy.cn/api/wl/s/jzw")
+  words.encoding = 'utf-8'
   if words.status_code != 200:
     return get_words()
   return add_spaces(words.json()['data']['text'])
