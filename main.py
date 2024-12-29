@@ -20,11 +20,12 @@ template_id = os.environ["TEMPLATE_ID"]
 
 
 def get_weather():
-  url = "https://api.seniverse.com/v3/weather/now.json?key={weather_key}&language=zh-Hans&unit=c"
+  url = "https://api.seniverse.com/v3/weather/now.json?key={weather_key}&location=beijing&language=zh-Hans&unit=c"
   res = requests.get(url).json()
+  print(res)
   weather = (res['results'][0])["daily"][0]
   return weather
-
+  
 def get_count():
   delta = today - datetime.strptime(start_date, "%Y-%m-%d")
   return delta.days
