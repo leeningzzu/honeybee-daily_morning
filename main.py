@@ -39,7 +39,7 @@ def get_words():
     words.encoding = 'utf-8'
     if words.status_code != 200:
         return get_words()
-    return add_spaces(words.json()['data']['text'])
+    return add_spaces(words.json())
 
   
 def get_random_color():
