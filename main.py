@@ -22,8 +22,8 @@ template_id = os.environ["TEMPLATE_ID"]
 def get_weather():
   url = "https://api.seniverse.com/v3/weather/now.json?key={weather_key}&language=zh-Hans&unit=c"
   res = requests.get(url).json()
-  weather = res['data']['list'][0]
-  return weather['weather'], math.floor(weather['temp'])
+  weather = (res['results'][0])["daily"][0]
+  return weather
 
 def get_count():
   delta = today - datetime.strptime(start_date, "%Y-%m-%d")
@@ -48,7 +48,7 @@ def get_random_color():
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
-wea, temperature = get_weather()
-data = {"weather":{"value":wea},"temperature":{"value":temperature},"love_days":{"value":get_count()},"birthday_left":{"value":get_birthday()},"words":{"value":get_words(), "color":get_random_color()}}
+weather = get_weather()
+data = {"weather":{"value":weather['text_day']},'tem_high': {'value': weather['high']},"tem_low":{"value":weather['low'},"love_days":{"value":get_count()},"birthday_left":{"value":get_birthday()},"words":{"value":get_words(), "color":get_random_color()}}
 res = wm.send_template(user_id, template_id, data)
 print(res)
