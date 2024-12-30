@@ -144,9 +144,6 @@ data = {
     "love_days": {
         "value": get_count(),
     },
-    "today_note": {
-         "value": get_daily_love()
-    },
    "quest": {
         "value": quest
     },
