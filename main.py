@@ -19,12 +19,8 @@ app_secret = os.environ["APP_SECRET"]
 
 user_id1 = os.environ.get("USER_ID1")
 user_id2 = os.environ.get("USER_ID2")
-# 将两个 user_id 放入字典或其他结构中
-user_ids = {"user_id": user_id1, "user_id": user_id2}
-# 遍历两个用户并处理
-for user_info in user_ids:
-    # 从用户信息中提取需要的内容
-    user_id = user_info['user_id']
+# 用户ID列表
+user_ids = [user_id1, user_id2]
   
 template_id = os.environ["TEMPLATE_ID"]
 
@@ -205,7 +201,7 @@ data = {
 }
 
 # 调用 send_template 方法
-res1 = wm.send_template(user_id, template_id, data)
+res1 = wm.send_template(user_ids, template_id, data)
 
 
 print(res)
