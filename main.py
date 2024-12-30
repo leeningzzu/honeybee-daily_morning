@@ -17,8 +17,7 @@ weather_key = os.getenv("WEATHER_API_KEY")
 app_id = os.environ["APP_ID"]
 app_secret = os.environ["APP_SECRET"]
 
-user_id = os.environ.get("USER_ID1")
-  
+user_id = os.environ["USER_ID"]
 template_id = os.environ["TEMPLATE_ID"]
 
 
@@ -196,9 +195,6 @@ data = {
     }
 
 }
-
-# 调用 send_template 方法
-res1 = wm.send_template(user_id, template_id, data)
-
-
+  
+res = wm.send_template(user_id, template_id, data)
 print(res)
