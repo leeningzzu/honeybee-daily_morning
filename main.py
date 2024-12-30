@@ -34,16 +34,11 @@ def get_count():
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
   
 def get_words():
-    resp = requests.get('http://open.iciba.com/dsapi')
-    if resp.status_code == 200:
-        conentJson = resp.json()
-        content = conentJson.get('content')
-        note = conentJson.get('note')
-        # print(f"{content}\n{note}")
-        return f"{content}\n{note}\n"
-    else:
-        print("没有获取到数据")
-        return None  
+    words = requests.get("https://tenapi.cn/v2/yiyan?format=json").json()
+    print(words)
+    if words['code'] != 200:
+        return get_words()
+    return words['data']['hitokoto']
   
 def get_random_color():
   return "#%06x" % random.randint(0, 0xFFFFFF)
