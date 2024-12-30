@@ -106,7 +106,9 @@ title = title_content.get('title', '')
 content = title_content.get('content', '')
 content_typeid = title_content.get('typeid', '')  # 获取title和content的typeid
 
-
+#    "content": {
+#      "value": content
+#  }
   
 # 配置数据
 client = WeChatClient(app_id, app_secret)
@@ -135,9 +137,7 @@ data = {
     "title": {
         "value": title
     },
-    "content": {
-        "value": content
-    }
+
 }
   
 res = wm.send_template(user_id, template_id, data)
