@@ -41,9 +41,6 @@ def get_words():
     sentence = all_dict['returnObj'][0]
     daily_love = sentence
     return daily_love
-  
-def get_random_color():
-  return "#%06x" % random.randint(0, 0xFFFFFF)
 
   
 client = WeChatClient(app_id, app_secret)
@@ -64,8 +61,7 @@ data = {
         "value": get_count(),
     },
     "words": {
-        "value": get_words(),
-        "color": get_random_color()
+        "value": get_words()
     }
 }
 
