@@ -137,7 +137,7 @@ data = {
     },
     "content": {
         "value": content
-    },
+    }
 }
   
 res = wm.send_template(user_id, template_id, data)
