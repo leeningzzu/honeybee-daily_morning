@@ -35,6 +35,8 @@ def get_count():
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
 sys.setrecursionlimit(10000)
 
+sys.setrecursionlimit(10000)
+
 def get_title_content():
     url = "https://whyta.cn/api/tx/tenwhy?key=96f163cda80b&num=1"
     r = requests.get(url)
@@ -76,6 +78,20 @@ def get_naowan_quest_result():
     else:
         return {"quest": None, "result": None, "typeid": None}
 
+def send_long_message(data, max_length=4096):
+    """Send a message in chunks if the length exceeds the limit."""
+    content = data["value"]
+    if len(content) > max_length:
+        # Split content into chunks
+        chunks = [content[i:i+max_length] for i in range(0, len(content), max_length)]
+        for chunk in chunks:
+            print(f"Sending chunk: {chunk[:30]}...")  # Print first 30 characters as a preview
+            # Here you would send the chunk to the actual service (e.g., wxpy or other messaging service)
+            # For example: wm.send(chunk)
+    else:
+        print(f"Sending full content: {content[:30]}...")  # Print first 30 characters as a preview
+        # Here you would send the full message: wm.send(data)
+
 # 获取 naowan 数据和标题内容数据
 quest_result = get_naowan_quest_result()
 quest = quest_result.get('quest', '')
@@ -96,11 +112,10 @@ content = title_content.get('content', '')
 content_typeid = title_content.get('typeid', '')  # 获取title和content的typeid
 
 # 限制content的长度，避免显示过长
-max_content_length = 100000 # 根据需求调整最大长度
+max_content_length = 4096  # 微信消息最大长度为4096个字符
 if len(content) > max_content_length:
-    content = content[:max_content_length]  # 截取前1000字符
-
-
+    content = content[:max_content_length]  # 截取前4096字符
+  
 # 配置数据
 client = WeChatClient(app_id, app_secret)
 
