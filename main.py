@@ -78,19 +78,6 @@ def get_naowan_quest_result():
     else:
         return {"quest": None, "result": None, "typeid": None}
 
-def send_long_message(data, max_length=4096):
-    """Send a message in chunks if the length exceeds the limit."""
-    content = data["value"]
-    if len(content) > max_length:
-        # Split content into chunks
-        chunks = [content[i:i+max_length] for i in range(0, len(content), max_length)]
-        for chunk in chunks:
-            print(f"Sending chunk: {chunk[:30]}...")  # Print first 30 characters as a preview
-            # Here you would send the chunk to the actual service (e.g., wxpy or other messaging service)
-            # For example: wm.send(chunk)
-    else:
-        print(f"Sending full content: {content[:30]}...")  # Print first 30 characters as a preview
-        # Here you would send the full message: wm.send(data)
 
 # 获取 naowan 数据和标题内容数据
 quest_result = get_naowan_quest_result()
@@ -136,7 +123,7 @@ data = {
     },
     "title": {
         "value": title
-    },
+    }
 
 }
   
