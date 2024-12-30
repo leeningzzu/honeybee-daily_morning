@@ -19,6 +19,8 @@ app_secret = os.environ["APP_SECRET"]
 
 user_id1 = os.environ.get("USER_ID1")
 user_id2 = os.environ.get("USER_ID2")
+# 将两个 user_id 放入字典或其他结构中
+user_ids = {"user_id1": user_id1, "user_id2": user_id2}
 
 template_id = os.environ["TEMPLATE_ID"]
 
@@ -198,8 +200,8 @@ data = {
 
 }
 
-# 分别调用 send_template 方法
-res1 = wm.send_template(user_id1, template_id, data)
-res2 = wm.send_template(user_id2, template_id, data)
+# 调用 send_template 方法
+res1 = wm.send_template(user_ids, template_id, data)
+
 
 print(res)
