@@ -35,34 +35,29 @@ def get_count():
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
   
 def get_title_content():
-    # 设置最大输出限制
-    sys.setrecursionlimit(10000)  # 增加最大递归深度，避免输出被截断（一般情况下不需要）
-
-    # 定义URL
+    sys.setrecursionlimit(10000)
     url = "https://whyta.cn/api/tx/tenwhy?key=96f163cda80b&num=1"
-    
-    # 发送GET请求
     r = requests.get(url)
-    
-    # 解析响应JSON数据
     response_json = r.json()
-    
-    # 获取返回数据中的第一个title和content
+
     result_list = response_json.get("result", {}).get("list", [])
-    
-    if result_list:  # 确保列表不为空
+
+    if result_list:
         title = result_list[0].get("title")
         content = result_list[0].get("content")
         
-        # 打印标题和内容，确保内容不被截断
+        # 打印标题
         print("Title:", title)
-        print("Content:")
-        print(content)  # 这里直接打印整个内容
+
+        # 将内容输出到文件
+        with open("content_output.txt", "w", encoding="utf-8") as file:
+            file.write(f"Title: {title}\n\n")
+            file.write(f"Content:\n{content}")
         
-        # 返回包含title和content的字典
+        print("Content has been written to 'content_output.txt'.")
+
         return {"title": title, "content": content}
     else:
-        # 如果没有数据，返回None
         return {"title": None, "content": None}
 
   
