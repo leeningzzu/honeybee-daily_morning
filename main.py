@@ -46,20 +46,15 @@ def get_naowan_quest_result():
     url = "https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=1"
     r = requests.get(url)
     response_json = json.loads(r.text)
-
-    # 初始列表，用于存储不重复的quest和result
-    result_list = []
-
-    # 解析NaowanAPI的数据
-    for item in response_json["result"]["list"]:
-        quest = item["quest"]
-        result = item["result"]
-
-        # 添加非重复quest和result到 result_list
-        if (quest, result) not in result_list:
-            result_list.append((quest, result))
-
-    return result_list
+    
+    # 获取返回数据中的第一个quest和result
+    result_list = response_json["result"]["list"]
+    if result_list:  # 确保列表不为空
+        quest = result_list[0]["quest"]
+        result = result_list[0]["result"]
+        return {"quest": quest, "result": result}
+    else:
+        return {"quest": None, "result": None}  # 如果没有数据，返回None
 
 
   
