@@ -34,11 +34,13 @@ def get_count():
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
   
 def get_words():
-    words = requests.get("https://tenapi.cn/v2/yiyan?format=json").json()
-    print(words)
-    if words['code'] != 200:
-        return get_words()
-    return words['data']['hitokoto']
+    # 每日一句情话
+    url = "https://api.lovelive.tools/api/SweetNothings/Serialization/Json"
+    r = requests.get(url)
+    all_dict = json.loads(r.text)
+    sentence = all_dict['returnObj'][0]
+    daily_love = sentence
+    return daily_love
   
 def get_random_color():
   return "#%06x" % random.randint(0, 0xFFFFFF)
