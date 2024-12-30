@@ -35,7 +35,7 @@ def get_count():
   
 def get_words():
     resp = requests.get('http://open.iciba.com/dsapi')
-    if resp.status_code == 200 and self.isJson(resp):
+    if resp.status_code == 200:
         conentJson = resp.json()
         content = conentJson.get('content')
         note = conentJson.get('note')
