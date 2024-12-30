@@ -42,12 +42,25 @@ def get_daily_love():
     daily_love = sentence
     return daily_love
   
-
+def get_naowan_quest_result():
     url = "https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=1"
     r = requests.get(url)
     response_json = json.loads(r.text)
-    quest=response_json["quest"]
-    result = response_json["result"]
+
+    # 初始列表，用于存储不重复的quest和result
+    result_list = []
+
+    # 解析NaowanAPI的数据
+    for item in response_json["result"]["list"]:
+        quest = item["quest"]
+        result = item["result"]
+
+        # 添加非重复quest和result到 result_list
+        if (quest, result) not in result_list:
+            result_list.append((quest, result))
+
+    return result_list
+
 
   
 client = WeChatClient(app_id, app_secret)
@@ -71,10 +84,10 @@ data = {
          "value": get_daily_love()
     },
    "quest": {
-         "value": quest
+         "value":get_naowan_quest_result['quest']
     },
  "result": {
-         "value": result
+         "value":get_naowan_quest_result['result'] 
     },
 }
 
