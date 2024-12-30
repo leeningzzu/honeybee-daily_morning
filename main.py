@@ -33,21 +33,23 @@ def get_count():
   return delta.days
   
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
-  
+sys.setrecursionlimit(10000)
+
 def get_title_content():
-    sys.setrecursionlimit(10000)
     url = "https://whyta.cn/api/tx/tenwhy?key=96f163cda80b&num=1"
     r = requests.get(url)
     response_json = r.json()
 
     result_list = response_json.get("result", {}).get("list", [])
-
+    
     if result_list:
         title = result_list[0].get("title")
         content = result_list[0].get("content")
-        
-        # 打印标题
+        typeid = result_list[0].get("typeid")  # 获取typeid
+
+        # 打印标题和类型ID
         print("Title:", title)
+        print("Typeid:", typeid)
 
         # 将内容输出到文件
         with open("content_output.txt", "w", encoding="utf-8") as file:
@@ -56,27 +58,29 @@ def get_title_content():
         
         print("Content has been written to 'content_output.txt'.")
 
-        return {"title": title, "content": content}
+        return {"title": title, "content": content, "typeid": typeid}
     else:
-        return {"title": None, "content": None}
+        return {"title": None, "content": None, "typeid": None}
 
-  
 def get_naowan_quest_result():
     url = "https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=1"
     r = requests.get(url)
-    response_json = json.loads(r.text)
+    response_json = r.json()
     
-    # 获取返回数据中的第一个quest和result
-    result_list = response_json["result"]["list"]
-    if result_list:  # 确保列表不为空
-        quest = result_list[0]["quest"]
-        result = result_list[0]["result"]
-        return {"quest": quest, "result": result}
+    result_list = response_json.get("result", {}).get("list", [])
+    if result_list:
+        quest = result_list[0].get("quest")
+        result = result_list[0].get("result")
+        typeid = result_list[0].get("typeid")  # 获取对应的typeid
+        return {"quest": quest, "result": result, "typeid": typeid}
     else:
-        return {"quest": None, "result": None}  # 如果没有数据，返回None
+        return {"quest": None, "result": None, "typeid": None}
 
+# 获取 naowan 数据和标题内容数据
 quest_result = get_naowan_quest_result()
 quest = quest_result.get('quest', '')
+quest_typeid = quest_result.get('typeid', '')  # 获取对应的typeid
+
 # 去掉可能的换行符
 quest = quest.replace("\n", " ").replace("\r", " ")
 
@@ -84,7 +88,25 @@ quest = quest.replace("\n", " ").replace("\r", " ")
 max_quest_length = 1000  # 根据需求调整最大长度
 if len(quest) > max_quest_length:
     quest = quest[:max_quest_length]  # 截取前1000字符
-  
+
+# 获取标题和内容
+title_content = get_title_content()
+title = title_content.get('title', '')
+content = title_content.get('content', '')
+content_typeid = title_content.get('typeid', '')  # 获取title和content的typeid
+
+# 限制content的长度，避免显示过长
+max_content_length = 1000  # 根据需求调整最大长度
+if len(content) > max_content_length:
+    content = content[:max_content_length]  # 截取前1000字符
+
+# 确保quest和result的typeid与title和content的typeid一致
+if quest_typeid != content_typeid:
+    print(f"Warning: The 'typeid' of quest ({quest_typeid}) does not match the 'typeid' of title/content ({content_typeid}).")
+else:
+    print("typeid matches between quest/result and title/content.")
+
+# 配置数据
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
@@ -102,18 +124,19 @@ data = {
     "love_days": {
         "value": get_count(),
     },
-   "quest": {
+    "quest": {
         "value": quest
     },
- "result": {"value":get_naowan_quest_result()['result'] 
+    "result": {
+        "value": quest_result['result']
     },
-   "title": {
-        "value": get_title_content()['title'] 
+    "title": {
+        "value": title
     },
- "content": {"value":get_title_content()['content'] 
+    "content": {
+        "value": content
     },
 }
-
   
 res = wm.send_template(user_id, template_id, data)
 print(res)
