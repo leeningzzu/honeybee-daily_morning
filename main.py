@@ -96,15 +96,10 @@ content = title_content.get('content', '')
 content_typeid = title_content.get('typeid', '')  # 获取title和content的typeid
 
 # 限制content的长度，避免显示过长
-max_content_length = 1000  # 根据需求调整最大长度
+max_content_length = 100000 # 根据需求调整最大长度
 if len(content) > max_content_length:
     content = content[:max_content_length]  # 截取前1000字符
 
-# 确保quest和result的typeid与title和content的typeid一致
-if quest_typeid != content_typeid:
-    print(f"Warning: The 'typeid' of quest ({quest_typeid}) does not match the 'typeid' of title/content ({content_typeid}).")
-else:
-    print("typeid matches between quest/result and title/content.")
 
 # 配置数据
 client = WeChatClient(app_id, app_secret)
