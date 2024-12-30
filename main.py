@@ -34,22 +34,17 @@ def get_count():
   
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
   
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36",
-}
-def getword():
-    '''
-    获取一段暖话
-    :return:
-    '''
-    user_url = 'http://www.ainicr.cn/qh/t83.html'
-    resp = requests.get(user_url, headers=headers)
-    soup_texts = BeautifulSoup(resp.text, 'lxml')
-    # 『one -个』 中的每日一句
-    num = random.randint(0,30)
-    every_msg = soup_texts.find_all('div', class_='pbllists')[0].find_all('p')[num].text
-    return every_msg
-  
+def get_words(self):
+    resp = requests.get('http://open.iciba.com/dsapi')
+    if resp.status_code == 200 and self.isJson(resp):
+        conentJson = resp.json()
+        content = conentJson.get('content')
+        note = conentJson.get('note')
+        # print(f"{content}\n{note}")
+        return f"{content}\n{note}\n"
+    else:
+        print("没有获取到数据")
+        return None  
   
 def get_random_color():
   return "#%06x" % random.randint(0, 0xFFFFFF)
