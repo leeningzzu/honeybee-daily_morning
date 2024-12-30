@@ -84,10 +84,9 @@ data = {
          "value": get_daily_love()
     },
    "quest": {
-         "value":get_naowan_quest_result['quest']
+         "value":get_naowan_quest_result()['quest']
     },
- "result": {
-         "value":get_naowan_quest_result['result'] 
+ "result": {"value":get_naowan_quest_result()['result'] 
     },
 }
 
