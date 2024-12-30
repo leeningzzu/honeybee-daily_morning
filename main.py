@@ -33,7 +33,7 @@ def get_count():
   
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
   
-def get_words(self):
+def get_words():
     resp = requests.get('http://open.iciba.com/dsapi')
     if resp.status_code == 200 and self.isJson(resp):
         conentJson = resp.json()
