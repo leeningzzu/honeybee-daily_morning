@@ -69,13 +69,13 @@ data = {
     },
     "today_note": {
          "value": get_daily_love()
-    }
+    },
    "quest": {
          "value": quest
-    }
+    },
  "result": {
          "value": result
-    }
+    },
 }
 
   
