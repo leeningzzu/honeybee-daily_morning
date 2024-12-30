@@ -41,6 +41,13 @@ def get_daily_love():
     sentence = all_dict['returnObj'][0]
     daily_love = sentence
     return daily_love
+  
+
+    url = "https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=1"
+    r = requests.get(url)
+    response_json = json.loads(r.text)
+    quest=response_json["quest"]
+    result = response_json["result"]
 
   
 client = WeChatClient(app_id, app_secret)
@@ -62,6 +69,12 @@ data = {
     },
     "today_note": {
          "value": get_daily_love()
+    }
+   "quest": {
+         "value": quest
+    }
+ "result": {
+         "value": result
     }
 }
 
