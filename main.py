@@ -17,9 +17,15 @@ weather_key = os.getenv("WEATHER_API_KEY")
 app_id = os.environ["APP_ID"]
 app_secret = os.environ["APP_SECRET"]
 
-user_id= os.environ.get("USER_ID1")
-
-
+user_id1 = os.environ.get("USER_ID1")
+user_id2 = os.environ.get("USER_ID2")
+# 将两个 user_id 放入字典或其他结构中
+user_ids = {"user_id": user_id1, "user_id": user_id2}
+# 遍历两个用户并处理
+for user_info in user_ids:
+    # 从用户信息中提取需要的内容
+    user_id = user_info['user_id']
+  
 template_id = os.environ["TEMPLATE_ID"]
 
 
