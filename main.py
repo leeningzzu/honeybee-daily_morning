@@ -33,7 +33,7 @@ def get_count():
   
 #https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
   
-def get_words():
+def get_daily_love():
     # 每日一句情话
     url = "https://api.lovelive.tools/api/SweetNothings/Serialization/Json"
     r = requests.get(url)
@@ -60,8 +60,8 @@ data = {
     "love_days": {
         "value": get_count(),
     },
-    "words": {
-        "value": get_words()
+    "today_note": {
+         "value": get_daily_love()
     }
 }
 
