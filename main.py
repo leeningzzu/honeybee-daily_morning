@@ -64,44 +64,6 @@ def get_title_content():
         # 如果没有数据，返回None
         return {"title": None, "content": None}
 
-# 调用函数并获取数据
-get_title_content()
-3. 保存到文件（如果内容非常长）：
-如果内容特别长，或者你希望将长文本保存在文件中，以便更方便地查看，可以将 content 保存到文本文件中：
-
-python
-import requests
-import json
-
-def get_title_content():
-    # 定义URL
-    url = "https://whyta.cn/api/tx/tenwhy?key=96f163cda80b&num=1"
-    # 发送GET请求
-    r = requests.get(url)
-    # 解析响应JSON数据
-    response_json = r.json()
-    # 获取返回数据中的第一个title和content
-    result_list = response_json.get("result", {}).get("list", [])
-    
-    if result_list:  # 确保列表不为空
-        title = result_list[0].get("title")
-        content = result_list[0].get("content")
-        
-        # 打印标题
-        print("Title:", title)
-        
-        # 将内容保存到文件
-        with open("content.txt", "w", encoding="utf-8") as f:
-            f.write(content)  # 将content写入文件
-        
-        print("Content has been saved to content.txt")
-        
-        # 返回包含title和content的字典
-        return {"title": title, "content": content}
-    else:
-        # 如果没有数据，返回None
-        return {"title": None, "content": None}
-
   
 def get_naowan_quest_result():
     url = "https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=1"
