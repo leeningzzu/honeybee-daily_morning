@@ -15,8 +15,7 @@ weather_key = os.getenv("WEATHER_API_KEY")
 app_id = os.environ["APP_ID"]
 app_secret = os.environ["APP_SECRET"]
 
-user_id1 = os.environ["USER_ID1"]
-user_id2 = os.environ["USER_ID2"]
+user_id = os.environ["USER_ID1"]
 template_id = os.environ["TEMPLATE_ID"]
 
 # 获取天气信息
@@ -92,24 +91,7 @@ def get_title_content():
 
     # 如果没有符合条件的 title，返回 None
     return None
-
-# 发送消息到微信，确保quest、title、content长度不超过20个字符
-def send_message(data, user_id):
-    """发送消息到微信，确保quest、title、content长度不超过20个字符。"""
     
-    # Extract quest, content, and title
-    quest = data.get("quest", {}).get("value", '')
-    content = data.get("content", {}).get("value", '')
-    title = data.get("title", {}).get("value", '')
-
-    # Ensure quest, content, and title do not exceed 20 characters
-    if len(quest) > 20:
-        quest = quest[:20]
-    if len(content) > 20:
-        content = content[:20]
-    if len(title) > 20:
-        title = title[:20]
-
     # Prepare data for message
     message_data = {
         "weather": {
@@ -143,63 +125,3 @@ def send_message(data, user_id):
     wm = WeChatMessage(client)
     res = wm.send_template(user_id, template_id, message_data)
     print(f"Message sent to {user_id}: {res}")
-
-# 发送消息给多个用户
-def send_messages_to_users(data, user_ids):
-    for user_id in user_ids:
-        send_message(data, user_id)
-
-# 主逻辑
-def main():
-    # 获取 quest 和 title 内容
-    quest_result = get_naowan_quest_result()
-    title_content = get_title_content()
-
-    # 如果 quest_result 为 None，表示未获取到新的 quest
-    if quest_result is None:
-        print("未获取到新的 quest，跳过本次抓取。")
-        return
-    else:
-        quest = quest_result.get('quest', '')
-        quest_typeid = quest_result.get('typeid', '')  # 获取对应的 typeid
-
-        # 清理 quest 中的换行符
-        quest = quest.replace("\n", " ").replace("\r", " ")
-
-    # 获取标题和内容
-    if title_content is None:
-        print("未获取到新的 title，跳过本次抓取。")
-        return
-    else:
-        title = title_content.get('title', '')
-        content = title_content.get('content', '')
-        content_typeid = title_content.get('typeid', '')
-
-    # 准备发送的消息数据
-    weather = get_weather()
-    data = {
-        "weather": weather['text_day'],
-        'tem_high': weather['high'],
-        "tem_low": weather['low'],
-        "love_days": get_count(),
-        "quest": {
-            "value": quest
-        },
-        "result": {
-            "value": quest_result.get('result', '')
-        },
-        "title": {
-            "value": title
-        },
-        "content": {
-            "value": content
-        }
-    }
-
-    # 获取用户 ID 列表并发送消息
-    user_ids = [user_id1, user_id2]
-    send_messages_to_users(data, user_ids)
-
-# 执行主逻辑
-if __name__ == "__main__":
-    main()
