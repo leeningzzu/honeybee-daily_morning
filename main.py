@@ -1,8 +1,13 @@
+from datetime import date, datetime
+import math
+import json
 import requests
 from wechatpy import WeChatClient
-from wechatpy.client.api import WeChatMessage
+from wechatpy.client.api import WeChatMessage, WeChatTemplate
+import requests
 import os
-from datetime import datetime
+import random
+
 
 # 获取当前日期
 today = datetime.now()
@@ -124,4 +129,4 @@ def get_title_content():
     client = WeChatClient(app_id, app_secret)
     wm = WeChatMessage(client)
     res = wm.send_template(user_id, template_id, message_data)
-    print(f"Message sent to {user_id}: {res}")
+    print(res)
