@@ -45,32 +45,40 @@ def get_naowan_quest_result():
     url = "https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=1"
     r = requests.get(url)
     response_json = r.json()
-    
+
     result_list = response_json.get("result", {}).get("list", [])
     
     last_typeid = None  # 用来记录上一个 typeid
     
-    for item in result_list:
-        quest = item.get("quest")
-        result = item.get("result")
-        typeid = item.get("typeid")  # 获取对应的 typeid
+    # 使用递归/循环来继续获取符合条件的 quest
+    while result_list:
+        for item in result_list:
+            quest = item.get("quest")
+            result = item.get("result")
+            typeid = item.get("typeid")  # 获取对应的 typeid
 
-        # 如果 quest 长度超过 20 字，跳过该条数据
-        if len(quest) > 20:  
-            print(f"quest 长度超过 20 字，跳过: {quest}")
-            last_typeid = typeid  # 记录当前 typeid
-            continue  # 跳过当前 quest，继续查找下一个
+            # 如果 quest 长度超过 20 字，跳过该条数据
+            if len(quest) > 20:  
+                print(f"quest 长度超过 20 字，跳过: {quest}")
+                last_typeid = typeid  # 记录当前 typeid
+                continue  # 跳过当前 quest，继续查找下一个
 
-        # 检查 quest 是否已抓取，避免重复
-        if quest in grabbed_quests:
-            print(f"重复的 quest，跳过: {quest}")
-            continue
+            # 检查 quest 是否已抓取，避免重复
+            if quest in grabbed_quests:
+                print(f"重复的 quest，跳过: {quest}")
+                continue
 
-        # 将 quest 添加到已抓取的集合中
-        grabbed_quests.add(quest)
+            # 将 quest 添加到已抓取的集合中
+            grabbed_quests.add(quest)
 
-        # 返回符合条件的 quest
-        return {"quest": quest, "result": result, "typeid": typeid}
+            # 返回符合条件的 quest
+            return {"quest": quest, "result": result, "typeid": typeid}
+        
+        # 如果没有符合条件的 quest，重新请求新数据
+        print("未找到符合条件的 quest，重新请求数据...")
+        r = requests.get(url)
+        response_json = r.json()
+        result_list = response_json.get("result", {}).get("list", [])
     
     # 如果没有符合条件的 quest，返回 None
     return None
@@ -120,9 +128,9 @@ def send_message(data):
     """发送消息到微信，确保title和content完整显示。"""
     
     # 获取 quest 和 content 的完整信息
-    quest = data["quest"]["value"]
-    content = data["content"]["value"]
-    title = data["title"]["value"]
+    quest = data.get("quest", {}).get("value", '')
+    content = data.get("content", {}).get("value", '')
+    title = data.get("title", {}).get("value", '')
     
     # 确保 quest 和 content 不超长，如果确实超长则截取
     max_length = 100000  # 假设接口最大长度为 100000 字符（根据微信 API 的标准）
@@ -162,10 +170,6 @@ else:
         content = title_content.get('content', '')
         content_typeid = title_content.get('typeid', '')  # 获取 title 和 content 的 typeid
 
-#    "content": {
-#      "value": content
-#  }
-  
 # 配置数据
 client = WeChatClient(app_id, app_secret)
 
@@ -188,12 +192,14 @@ data = {
         "value": quest
     },
     "result": {
-        "value": quest_result['result']
+        "value": quest_result.get('result', '')
     },
     "title": {
         "value": title
+    },
+  "content": {
+        "value": content
     }
-
 }
   
 res = wm.send_template(user_id, template_id, data)
