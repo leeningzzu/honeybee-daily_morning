@@ -1,13 +1,8 @@
-from datetime import date, datetime
-import math
-import json
+from datetime import datetime
+import os
 import requests
 from wechatpy import WeChatClient
-from wechatpy.client.api import WeChatMessage, WeChatTemplate
-import requests
-import os
-import random
- 
+from wechatpy.client.api import WeChatMessage
 
 today = datetime.now()
 start_date = os.environ['START_DATE']
@@ -20,18 +15,19 @@ app_secret = os.environ["APP_SECRET"]
 user_id = os.environ["USER_ID"]
 template_id = os.environ["TEMPLATE_ID"]
 
+# 已抓取的 quest 集合，用于避免重复抓取
+grabbed_quests = set()
 
 def get_weather():
-  url = f"https://api.seniverse.com/v3/weather/daily.json?key=S-3Yf85YRFz1MzNUS&location=beijing&language=zh-Hans&unit=c"
-  res = requests.get(url).json()
-  print(res)
-  weather = (res['results'][0])["daily"][0]
-  return weather
+    url = f"https://api.seniverse.com/v3/weather/daily.json?key=S-3Yf85YRFz1MzNUS&location=beijing&language=zh-Hans&unit=c"
+    res = requests.get(url).json()
+    print(res)
+    weather = res['results'][0]["daily"][0]
+    return weather
   
 def get_count():
-  delta = today - datetime.strptime(start_date, "%Y-%m-%d")
-  return delta.days
-  
+    delta = today - datetime.strptime(start_date, "%Y-%m-%d")
+    return delta.days
 
 # 获取 naowan 数据
 def get_naowan_quest_result():
@@ -108,11 +104,31 @@ def get_title_content():
     return None
 
 
+# 获取 naowan quest 和 title 内容
+quest_result = get_naowan_quest_result()
+title_content = get_title_content()
+
+# 如果 quest_result 或 title_content 为 None，表示未获取到新的 quest 或 title
+if quest_result is None:
+    print("未获取到新的 quest，跳过本次抓取。")
+    exit()
+else:
+    quest = quest_result.get('quest', '')
+    result = quest_result.get('result', '')
+    quest_typeid = quest_result.get('typeid', '')  # 获取对应的 typeid
+
+    # 清理 quest 中的换行符
+    quest = quest.replace("\n", " ").replace("\r", " ")
+
+if title_content is None:
+    print("未获取到新的 title，跳过本次抓取。")
+    exit()
+else:
+    title = title_content.get('title', '')
+    content = title_content.get('content', '')
+    content_typeid = title_content.get('typeid', '')
 
 # 配置数据
-client = WeChatClient(app_id, app_secret)
-
-wm = WeChatMessage(client)
 weather = get_weather()
 data = {
     "weather": {
@@ -131,15 +147,20 @@ data = {
         "value": quest
     },
     "result": {
-        "value": quest_result.get('result', '')
+        "value": result
     },
     "title": {
         "value": title
     },
-  "content": {
+    "content": {
         "value": content
     }
 }
-  
+
+# 创建 WeChatClient 实例
+client = WeChatClient(app_id, app_secret)
+wm = WeChatMessage(client)
+
+# 发送模板消息
 res = wm.send_template(user_id, template_id, data)
 print(res)
