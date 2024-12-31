@@ -7,12 +7,9 @@ from wechatpy.client.api import WeChatMessage, WeChatTemplate
 import requests
 import os
 import random
+import sys 
 
-
-# 获取当前日期
 today = datetime.now()
-
-# 环境变量
 start_date = os.environ['START_DATE']
 city = os.environ['CITY']
 weather_key = os.getenv("WEATHER_API_KEY")
@@ -23,46 +20,66 @@ app_secret = os.environ["APP_SECRET"]
 user_id = os.environ["USER_ID"]
 template_id = os.environ["TEMPLATE_ID"]
 
-# 获取天气信息
+
 def get_weather():
-    url = f"https://api.seniverse.com/v3/weather/daily.json?key={weather_key}&location={city}&language=zh-Hans&unit=c"
-    res = requests.get(url).json()
-    weather = res['results'][0]["daily"][0]
-    return weather
-
-# 获取从开始日期到今天的天数
+  url = f"https://api.seniverse.com/v3/weather/daily.json?key=S-3Yf85YRFz1MzNUS&location=beijing&language=zh-Hans&unit=c"
+  res = requests.get(url).json()
+  print(res)
+  weather = (res['results'][0])["daily"][0]
+  return weather
+  
 def get_count():
-    delta = today - datetime.strptime(start_date, "%Y-%m-%d")
-    return delta.days
+  delta = today - datetime.strptime(start_date, "%Y-%m-%d")
+  return delta.days
+  
+#https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=10
 
-# 获取 naowan 任务结果，确保同一 typeid 下 quest 和 result 符合字符限制
+sys.setrecursionlimit(10000)
+
+# 用于保存已经抓取过的 quest 和 title
+grabbed_quests = set()
+grabbed_titles = set()
+
+# 获取 naowan 数据
 def get_naowan_quest_result():
     url = "https://whyta.cn/api/tx/naowan?key=96f163cda80b&num=1"
     r = requests.get(url)
     response_json = r.json()
 
     result_list = response_json.get("result", {}).get("list", [])
-
+    
+    last_typeid = None  # 用来记录上一个 typeid
+    
+    # 使用递归/循环来继续获取符合条件的 quest
     while result_list:
         for item in result_list:
             quest = item.get("quest")
             result = item.get("result")
-            typeid = item.get("typeid")
+            typeid = item.get("typeid")  # 获取对应的 typeid
 
-            # 检查 quest 和 result 是否都在 20 字符以内
-            if len(quest) > 20 or len(result) > 20:
-                print(f"quest 或 result 长度超过 20 字，跳过 typeid: {typeid}")
-                continue  # 跳过该 typeid，继续查找下一个
+            # 如果 quest 长度超过 20 字，跳过该条数据
+            if len(quest) > 20:  
+                print(f"quest 长度超过 20 字，跳过: {quest}")
+                last_typeid = typeid  # 记录当前 typeid
+                continue  # 跳过当前 quest，继续查找下一个
 
-            # 返回符合条件的 quest 和 result
+            # 检查 quest 是否已抓取，避免重复
+            if quest in grabbed_quests:
+                print(f"重复的 quest，跳过: {quest}")
+                continue
+
+            # 将 quest 添加到已抓取的集合中
+            grabbed_quests.add(quest)
+
+            # 返回符合条件的 quest
             return {"quest": quest, "result": result, "typeid": typeid}
         
-        # 如果当前没有符合条件的 quest，则重新请求数据
+        # 如果没有符合条件的 quest，重新请求新数据
         print("未找到符合条件的 quest，重新请求数据...")
         r = requests.get(url)
         response_json = r.json()
         result_list = response_json.get("result", {}).get("list", [])
-
+    
     # 如果没有符合条件的 quest，返回 None
     return None
 
@@ -96,37 +113,85 @@ def get_title_content():
 
     # 如果没有符合条件的 title，返回 None
     return None
-    
-    # Prepare data for message
-    message_data = {
-        "weather": {
-            "value": data["weather"]
-        },
-        'tem_high': {
-            "value": data['tem_high']
-        },
-        "tem_low": {
-            "value": data['tem_low']
-        },
-        "love_days": {
-            "value": data['love_days']
-        },
-        "quest": {
-            "value": quest
-        },
-        "result": {
-            "value": data['result']
-        },
-        "title": {
-            "value": title
-        },
-       "content": {
-            "value": content
-        }
-    }
 
-    # Create WeChat client and send message to user
-    client = WeChatClient(app_id, app_secret)
-    wm = WeChatMessage(client)
-    res = wm.send_template(user_id, template_id, message_data)
-    print(res)
+# 配置数据并发送消息
+def send_message(data):
+    """发送消息到微信，确保title和content完整显示。"""
+    
+    # 获取 quest 和 content 的完整信息
+    quest = data.get("quest", {}).get("value", '')
+    content = data.get("content", {}).get("value", '')
+    title = data.get("title", {}).get("value", '')
+    
+    # 确保 quest 和 content 不超长，如果确实超长则截取
+    max_length = 100000  # 假设接口最大长度为 100000 字符（根据微信 API 的标准）
+
+    if len(quest) > max_length:
+        quest = quest[:max_length]
+    if len(content) > max_length:
+        content = content[:max_length]
+
+    # 发送数据到微信接口，这里根据微信的客户端 API 进行发送
+    # 假设 wm.send() 是发送消息的接口，这里你需要根据实际情况调用微信的发送接口
+    # 下面为伪代码，实际情况需要替换为正确的调用方式
+    print(f"Sending message with Title: {title[:30]}... and Content: {content[:30]}...")  # 调试信息
+    # wm.send(data) # 替换为实际的消息发送代码
+
+# 获取 naowan 数据和标题内容数据
+quest_result = get_naowan_quest_result()
+
+# 如果 quest_result 为 None，表示抓取到了重复的 quest 或未能获取到数据，跳过
+if quest_result is None:
+    print("未获取到新的 quest，跳过本次抓取。")
+else:
+    quest = quest_result.get('quest', '')
+    quest_typeid = quest_result.get('typeid', '')  # 获取对应的 typeid
+
+    # 去掉可能的换行符
+    quest = quest.replace("\n", " ").replace("\r", " ")
+
+    # 获取标题和内容
+    title_content = get_title_content()
+
+    # 如果没有获取到有效的 title，跳过
+    if title_content is None:
+        print("未获取到新的 title，跳过本次抓取。")
+    else:
+        title = title_content.get('title', '')
+        content = title_content.get('content', '')
+        content_typeid = title_content.get('typeid', '')  # 获取 title 和 content 的 typeid
+
+# 配置数据
+client = WeChatClient(app_id, app_secret)
+
+wm = WeChatMessage(client)
+weather = get_weather()
+data = {
+    "weather": {
+        "value": weather['text_day'],
+    },
+    'tem_high': {
+        "value": weather['high'],
+    },
+    "tem_low": {
+        "value": weather['low'],
+    },
+    "love_days": {
+        "value": get_count(),
+    },
+    "quest": {
+        "value": quest
+    },
+    "result": {
+        "value": quest_result.get('result', '')
+    },
+    "title": {
+        "value": title
+    },
+  "content": {
+        "value": content
+    }
+}
+  
+res = wm.send_template(user_id, template_id, data)
+print(res)
